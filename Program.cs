@@ -7,11 +7,7 @@
 		static int lanciodadi(int posizioneAttuale, int lunghezzaMappa, int cavalcatura, Random rnd)
 		{
 			int dado = rnd.Next(1, 7); 
-			if (cavalcatura > 0)
-			{
-				Console.WriteLine("usi la cavalcatura: avanzamento bonus +2 caselle!");
-				dado =dado+2;
-			}
+			
 			Console.WriteLine($"hai tirato: {dado}");
 			posizioneAttuale =posizioneAttuale+ dado;
 			if (posizioneAttuale >= lunghezzaMappa)
@@ -22,7 +18,7 @@
 		}
 
 
-		static int eventocombattimento(ref int vita, ref int spada, Random rnd,ref int mostriuccisi,int scelta)
+		static int eventocombattimento(ref int vita, ref int spada, Random rnd,ref int mostriuccisi,int scelta,ref int cavalcatura)
 		{
 			Console.WriteLine("evento combattimento");
 
@@ -32,34 +28,49 @@
 				string risposta = Console.ReadLine();
 				if (risposta == "s")
 				{
-					Console.WriteLine("hai usato la spada e vinto il combattimento!");
-					spada = 0;
+					Console.WriteLine("hai usato la spada e vinto il combattimento");
+					spada--;
 					mostriuccisi++;
 					return vita;
 				}
 				else
 				{
-					Console.WriteLine("hai una piccola probabilità senza spada di vincere il combattimento.");
+					Console.WriteLine("hai una piccola probabilità senza spada di vincere il combattimento");
+				}
+			}
+			if (cavalcatura > 0)
+			{
+				Console.WriteLine("vuoi usare la cavalcatura per fuggire dal combattimento? (s/n)");
+				string decisione = Console.ReadLine();
+				if (decisione == "s")
+				{
+					Console.WriteLine("hai usato la cavalcatura e sei scappato dal combattimento, ma hai subito 10 punti danno");
+					cavalcatura--;
+					return vita - 10;
 				}
 			}
 
-			
+
+
 			int probabilita = rnd.Next(1, 7);
+			int danni = rnd.Next(5, 16);
 			if (probabilita <= 2)
 			{
-				Console.WriteLine("hai vinto il combattimento!");
-				return vita;
-				mostriuccisi++;	
+				Console.WriteLine("hai vinto il combattimento,pero hai subito "+ danni);
+			    mostriuccisi++;	
+				vita = vita - danni;
+
 				if (scelta == 2) 
 				{ 
 					vita = vita + 10;
 					Console.WriteLine("essendo un macellaio hai guadagnato 10 punti extra per la vittoria, ora hai " + vita +" di vita totale");
 				}
+				return vita;
 			}
 			else
 			{
 				int danno = rnd.Next(10, 31); 
-				Console.WriteLine($"hai perso il combattimento e subito {danno} punti vita.");
+				Console.WriteLine($"hai perso il combattimento e subito {danno} punti vita");
 				return vita - danno;
 			}
 		}
@@ -80,11 +91,11 @@
 			{
 				inventario[indice] = oggetto;
 				indice++;
-				Console.WriteLine($"{oggetto} aggiunto all'inventario.");
+				Console.WriteLine($"{oggetto} aggiunto all'inventario");
 			}
 			else
 			{
-				Console.WriteLine("inventario pieno!");
+				Console.WriteLine("inventario pieno");
 			}
 		}
 
@@ -100,42 +111,48 @@
 			for (int i = 0; i < indice; i++)
 			{
 				Console.WriteLine($" {inventario[i]}");
-				return true;
+				
 			}
-			return false;
+			return true;
 		}
 
 
 		static int eventoregalo(ref int vita, ref int spada, Random rnd,
-						string[] inventario, ref int indiceInventario)
+						string[] inventario, ref int indiceInventario,ref int cavalcatura)
 		{
-			Console.WriteLine("evento incontro con gli abitanti!");
+			Console.WriteLine("evento incontro con gli abitanti");
 
 			
-			int tipoRegalo = rnd.Next(1, 4);
+			int tipoRegalo = rnd.Next(1, 5);
 
 			if (tipoRegalo == 1)
 			{
-				Console.WriteLine("un abitante ti dà del cibo.");
+				Console.WriteLine("un abitante ti dà del cibo");
 				aggiinventario(inventario, ref indiceInventario, "Cibo");
 			}
 			else if (tipoRegalo == 2)
 			{
 				int danno = rnd.Next(10, 31);
-				Console.WriteLine($"un abitante sospetto ti dà cibo avariato! Perdi {danno} punti vita.");
+				Console.WriteLine($"un abitante sospetto ti dà cibo avariato Perdi {danno} punti vita");
 				vita =vita- danno;
 			}
-			else
+			else if (tipoRegalo == 3)
 			{
 				if (spada == 0)
 				{
-					Console.WriteLine("un abitante ti regala una spada!");
-					spada = 1;
+					Console.WriteLine("un abitante ti regala una spada");
+					spada++;
+					aggiinventario(inventario, ref indiceInventario, "Spada");
 				}
 				else
 				{
-					Console.WriteLine("un abitante voleva darti una spada, ma ne possiedi già una.");
+					Console.WriteLine("un abitante voleva darti una spada, ma ne possiedi già una");
 				}
+			}
+			else { 
+				Console.WriteLine("un abitante ti regala una cavalcatura");
+				cavalcatura++;
+				aggiinventario(inventario, ref indiceInventario, "Cavalcatura");
 			}
 
 			return vita;
@@ -143,30 +160,40 @@
 
 		static void Main(string[] args)
 		{
-			int spada = 0, vita = 100, cavalcatura = 0, posizione = 0, mostriuccisi = 0;
+			int spada = 0, vita = 100, cavalcatura = 0, posizione = 0, mostriuccisi = 0,scelta,indiceInventario=0;
+			bool giocoInCorso = true;
+			string[] inventario = new string[10];
+
+
+			Random rnd = new Random();
 
 			Console.WriteLine("È un gioco di avventura testuale in cui il giocatore sceglie uno tra tre personaggi, ognuno con abilità specifiche come maggiore resistenza, danni più elevati o una migliore possibilità di fuga e avrai a disposizione un inventario dove tenere oggetti con massimo 10 slot . L’obiettivo è attraversare una mappa rappresentata da un array monodimensionale, composta da diverse città disposte lungo un percorso, e raggiungere la città finale.Il movimento avviene tramite il lancio di un dado virtuale che determina di quante caselle il personaggio può avanzare a ogni turno, entro un limite massimo. Ogni volta che si entra in una nuova città si attiva un evento casuale, che può includere combattimenti, incontri o la raccolta di oggetti. Durante la partita il giocatore può ottenere e utilizzare oggetti come pozioni, armi, scudi e cavalcature, che permettono di avanzare più velocemente ma possono andare perse. A ogni turno è possibile scegliere diverse azioni, come tirare il dado, controllare lo stato del personaggio, gestire l’inventario, usare un oggetto o uscire dal gioco. La partita termina quando si raggiunge la destinazione finale, quando il personaggio perde tutti i punti vita o in seguito a un evento speciale.\r\n\r\n");
-			Console.WriteLine("Scegli il tuo personaggio:");
 			Console.WriteLine("1 Guerriero: ha spada che si può usare su un combattimento, bassa probabilità di fuga.");
 			Console.WriteLine("2 Macellaio: parte con 50 di vita in più, e ogni uccisione ti da 10 di vita aggiuntivi.");
 			Console.WriteLine("3 Cavallerizzo: ha meno vita ma una cavalcatura per fuggire.");
-			int scelta = Convert.ToInt32(Console.ReadLine());
-			do {
+			
+			do 
+			{
+				Console.WriteLine("Scegli il tuo personaggio tra quelli elencati sopra ");
+				scelta=Convert.ToInt32(Console.ReadLine());
 
-				if (scelta == 1)
-				{
-					spada = 1;
-				}
-				else if (scelta == 2)
-				{
-					vita = vita + 50;
-				}
-				else if (scelta == 3)
-				{
-					cavalcatura = 1;
-				}
+			}
+			while (scelta < 1 || scelta > 3);
+			if (scelta == 1)
+			{
+				spada = 1;
+				aggiinventario(inventario, ref indiceInventario, "Spada");
+			}
+			else if (scelta == 2)
+			{
+				vita = vita + 50;
+			}
+			else if (scelta == 3)
+			{
+				cavalcatura = 1;
+				aggiinventario(inventario, ref indiceInventario, "Cavalcatura");
+			}
 
-			} while (scelta < 1 || scelta > 3);
 
 
 
@@ -200,15 +227,8 @@
 "Fine del Viaggio: La destinazione finale, segno del successo e della conclusione dell’avventura."
 		};
 
-			bool giocoInCorso = true;
-			string[] inventario = new string[10];
-			int indiceInventario = 0;
-
-
-			Random rnd = new Random();
-
-			while (giocoInCorso)
-
+			
+			while (giocoInCorso==true)
 			{
 				Console.WriteLine("premi invio per tirare il dado...");
 				Console.ReadLine();
@@ -219,12 +239,12 @@
 				int tipoEvento = rnd.Next(1, 8);
 				if (tipoEvento <=4)
 				{
-					vita = eventocombattimento(ref vita, ref spada, rnd, ref mostriuccisi,scelta);
+					vita = eventocombattimento(ref vita, ref spada, rnd, ref mostriuccisi,scelta,ref cavalcatura);
 				}
 				else if (tipoEvento<=7 || tipoEvento>=4)
 				{
 					vita = eventoregalo(ref vita, ref spada, rnd,
-						 inventario, ref indiceInventario);
+						 inventario, ref indiceInventario,  ref cavalcatura);
 				}
 				else
 				{
@@ -240,21 +260,28 @@
 
 					if (mostrainventario(inventario, indiceInventario))
 					{
-						
-						if (indiceInventario > 0) 
-						{ 
-							Console.WriteLine("vuoi mangiare il cibo che hai in inventario? (s/n)");
-							string sn=Console.ReadLine();
-							if (sn == "s") 
-							{ 
-								vita=vita+20;	
-								Console.WriteLine("hai mangiato il cibo e recuperato 20 punti vita. ora hai "+ vita +"di vita totale");	
-							}
-							else 
+						bool ciboTrovato = false;
+
+						for (int i = 0; i < indiceInventario; i++)
+						{
+							if (inventario[i] == "Cibo")
 							{
-								Console.WriteLine("non hai mangiato il cibo quindi non ahi recuperato vita.");
+								ciboTrovato = true;
 							}
 						}
+
+						if (ciboTrovato==true)
+						{
+							Console.WriteLine("vuoi mangiare il cibo che hai in inventario? (s/n)");
+							string sn = Console.ReadLine();
+
+							if (sn == "s")
+							{
+								vita=vita+ 20;
+								Console.WriteLine("hai mangiato del cibo e recuperato 20 punti vita.");
+							}
+						}
+
 					}
 					else
 					{

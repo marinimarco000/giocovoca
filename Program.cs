@@ -1,15 +1,13 @@
 ﻿namespace giocovoca
 {
-    internal class Program
-    {
-
-
+	internal class Program
+	{
 		static int lanciodadi(int posizioneAttuale, int lunghezzaMappa, int cavalcatura, Random rnd)
 		{
-			int dado = rnd.Next(1, 7); 
-			
+			int dado = rnd.Next(1, 7);
+
 			Console.WriteLine($"hai tirato: {dado}");
-			posizioneAttuale =posizioneAttuale+ dado;
+			posizioneAttuale = posizioneAttuale + dado;
 			if (posizioneAttuale >= lunghezzaMappa)
 			{
 				posizioneAttuale = lunghezzaMappa - 1;
@@ -18,9 +16,13 @@
 		}
 
 
-		static int eventocombattimento(ref int vita, ref int spada, Random rnd,ref int mostriuccisi,int scelta,ref int cavalcatura)
+		static int eventocombattimento(ref int vita, ref int spada, Random rnd, ref int mostriuccisi, int scelta, ref int cavalcatura)
 		{
 			Console.WriteLine("evento combattimento");
+
+			Console.WriteLine("Un mostro ti blocca la strada!");
+			Console.WriteLine("\"Non passerai vivo, umano!\"");
+			Console.WriteLine("Stringe le zanne e si prepara ad attaccare...");
 
 			if (spada > 0)
 			{
@@ -28,7 +30,7 @@
 				string risposta = Console.ReadLine();
 				if (risposta == "s")
 				{
-					Console.WriteLine("hai usato la spada e vinto il combattimento");
+					Console.WriteLine("hai usato la spada e vinto il combattimento opsssss");
 					spada--;
 					mostriuccisi++;
 					return vita;
@@ -44,7 +46,7 @@
 				string decisione = Console.ReadLine();
 				if (decisione == "s")
 				{
-					Console.WriteLine("hai usato la cavalcatura e sei scappato dal combattimento, ma hai subito 10 punti danno");
+					Console.WriteLine("hai usato la cavalcatura e sei scappato dal combattimento, ma hai subito 10 punti danno,vediamo se riesci a prendermi");
 					cavalcatura--;
 					return vita - 10;
 				}
@@ -56,20 +58,20 @@
 			int danni = rnd.Next(5, 16);
 			if (probabilita <= 2)
 			{
-				Console.WriteLine("hai vinto il combattimento,pero hai subito "+ danni);
-			    mostriuccisi++;	
+				Console.WriteLine("hai vinto il combattimento,pero hai subito " + danni);
+				mostriuccisi++;
 				vita = vita - danni;
 
-				if (scelta == 2) 
-				{ 
+				if (scelta == 2)
+				{
 					vita = vita + 10;
-					Console.WriteLine("essendo un macellaio hai guadagnato 10 punti extra per la vittoria, ora hai " + vita +" di vita totale");
+					Console.WriteLine("essendo un macellaio hai guadagnato 10 punti extra per la vittoria, ora hai " + vita + " di vita totale");
 				}
 				return vita;
 			}
 			else
 			{
-				int danno = rnd.Next(10, 31); 
+				int danno = rnd.Next(10, 31);
 				Console.WriteLine($"hai perso il combattimento e subito {danno} punti vita");
 				return vita - danno;
 			}
@@ -79,10 +81,10 @@
 
 
 		static int eventoniente(int vita)
-			{
-				Console.WriteLine("nessun evento accaduto");
-				return vita;
-			}
+		{
+			Console.WriteLine("nessun evento accaduto");
+			return vita;
+		}
 
 
 		static void aggiinventario(string[] inventario, ref int indice, string oggetto)
@@ -111,30 +113,78 @@
 			for (int i = 0; i < indice; i++)
 			{
 				Console.WriteLine($" {inventario[i]}");
-				
+
 			}
 			return true;
 		}
 
 
 		static int eventoregalo(ref int vita, ref int spada, Random rnd,
-						string[] inventario, ref int indiceInventario,ref int cavalcatura)
+						string[] inventario, ref int indiceInventario, ref int cavalcatura)
 		{
 			Console.WriteLine("evento incontro con gli abitanti");
 
-			
+
 			int tipoRegalo = rnd.Next(1, 5);
 
 			if (tipoRegalo == 1)
 			{
-				Console.WriteLine("un abitante ti dà del cibo");
+				Console.WriteLine("Un abitante si avvicina sorridendo.");
+				Console.WriteLine("\"Viaggiatore, sembri stanco... riposa nella mia casa.\"");
+				Console.WriteLine("\"Accetta questo cibo per il cammino.\"");
+				string asciiArt = @"
+                                                                  ___
+                                                             ___..--'  .`.
+                                                    ___...--'     -  .` `.`.
+                                           ___...--' _      -  _   .` -   `.`.
+                                  ___...--'  -       _   -       .`  `. - _ `.`.
+                           __..--'_______________ -         _  .`  _   `.   - `.`.
+                        .`    _ /\    -        .`      _     .`__________`. _  -`.`.
+                      .` -   _ /  \_     -   .`  _         .` |Train Depot|`.   - `.`.
+                    .`-    _  /   /\   -   .`        _   .`   |___________|  `. _   `.`.
+                  .`________ /__ /_ \____.`____________.`     ___       ___  - `._____`|
+                    |   -  __  -|    | - |  ____  |   | | _  |   |  _  |   |  _ |
+                    | _   |  |  | -  |   | |.--.| |___| |    |___|     |___|    |
+                    |     |--|  |    | _ | |'--'| |---| |   _|---|     |---|_   |
+                    |   - |__| _|  - |   | |.--.| |   | |    |   |_  _ |   |    |
+                 ---``--._      |    |   |=|'--'|=|___|=|====|___|=====|___|====|
+                 -- . ''  ``--._| _  |  -|_|.--.|_______|_______________________|
+                `--._           '--- |_  |:|'--'|:::::::|:::::::::::::::::::::::|
+                _____`--._ ''      . '---'``--._|:::::::|:::::::::::::::::::::::|
+                ----------`--._          ''      ``--.._|:::::::::::::::::::::::|
+                `--._ _________`--._'        --     .   ''-----..............LGB'
+                     `--._----------`--._.  _           -- . :''           -    ''
+                          `--._ _________`--._ :'              -- . :''      -- . ''
+                 -- . ''       `--._ ---------`--._   -- . :''
+                          :'        `--._ _________`--._:'  -- . ''      -- . ''
+                  -- . ''     -- . ''    `--._----------`--._      -- . ''     -- . ''
+                                              `--._ _________`--._
+                 -- . ''           :'              `--._ ---------`--._-- . ''    -- . ''
+                          -- . ''       -- . ''         `--._ _________`--._   -- . ''
+                :'                 -- . ''          -- . ''  `--._----------`--._";
+
 				aggiinventario(inventario, ref indiceInventario, "Cibo");
 			}
 			else if (tipoRegalo == 2)
 			{
 				int danno = rnd.Next(10, 31);
 				Console.WriteLine($"un abitante sospetto ti dà cibo avariato Perdi {danno} punti vita");
-				vita =vita- danno;
+				vita = vita - danno;
+				string asciiArt = @"
+                   \\\|||///
+                 .  =======
+                / \| O   O |
+                \ / \`___'/
+                 #   _| |_
+                (#) (     )
+                 #\//|* *|\\
+                 #\/(  *  )/
+                 #   =====
+                 #   ( U )
+                 #   || ||
+                .#---'| |`----.
+                `#----' `-----'";
+
 			}
 			else if (tipoRegalo == 3)
 			{
@@ -142,16 +192,59 @@
 				{
 					Console.WriteLine("un abitante ti regala una spada");
 					spada++;
+					string asciiArt = @"
+                         _
+                        (_)
+                        |_|
+                        |_|
+                        |_|
+                        |_|
+                        |_|
+                    o=========o
+                        | |
+                        | |
+                        | |
+                        | |
+                        | |
+                        | |
+                        | |
+                        | |
+                        | |
+                        | |
+                        | |
+                        | |
+                        | |
+                        | |
+                        | |
+                        | |
+                        | |
+                        | |
+                        | |
+                        \ /";
+
 					aggiinventario(inventario, ref indiceInventario, "Spada");
 				}
 				else
 				{
-					Console.WriteLine("un abitante voleva darti una spada, ma ne possiedi già una");
+					Console.WriteLine(" ciao viaggiatore vorrei regalarti una spada");
+					Console.WriteLine("ti ringrazio molto ma non posso accettare il tuo dono perche ne ho già una");
+
 				}
 			}
-			else { 
-				Console.WriteLine("un abitante ti regala una cavalcatura");
-				cavalcatura++;
+			else
+			{
+				if (cavalcatura > 0)
+				{
+					Console.WriteLine(" ciao viaggiatore vorrei regalarti una cavalcatura");
+					Console.WriteLine("ti ringrazio molto ma non posso accettare il tuo dono perche ne ho già una");
+
+
+				}
+				else
+				{
+					Console.WriteLine("un abitante ti regala una cavalcatura");
+					cavalcatura++;
+				}
 				aggiinventario(inventario, ref indiceInventario, "Cavalcatura");
 			}
 
@@ -160,7 +253,7 @@
 
 		static void Main(string[] args)
 		{
-			int spada = 0, vita = 100, cavalcatura = 0, posizione = 0, mostriuccisi = 0,scelta,indiceInventario=0;
+			int spada = 0, vita = 100, cavalcatura = 0, posizione = 0, mostriuccisi = 0, scelta, indiceInventario = 0;
 			bool giocoInCorso = true;
 			string[] inventario = new string[10];
 
@@ -171,25 +264,85 @@
 			Console.WriteLine("1 Guerriero: ha spada che si può usare su un combattimento, bassa probabilità di fuga.");
 			Console.WriteLine("2 Macellaio: parte con 50 di vita in più, e ogni uccisione ti da 10 di vita aggiuntivi.");
 			Console.WriteLine("3 Cavallerizzo: ha meno vita ma una cavalcatura per fuggire.");
-			
-			do 
+
+			do
 			{
 				Console.WriteLine("Scegli il tuo personaggio tra quelli elencati sopra ");
-				scelta=Convert.ToInt32(Console.ReadLine());
+				scelta = Convert.ToInt32(Console.ReadLine());
 
 			}
 			while (scelta < 1 || scelta > 3);
 			if (scelta == 1)
 			{
+
+				Console.WriteLine("Il guerriero stringe la spada.");
+				Console.WriteLine("La battaglia è il mio destino.");
+				string asciiArt = @"
+                 _
+                (_)
+                |_|
+                |_|
+                |_|
+                |_|
+                |_|
+            o=========o
+                | |
+                | |
+                | |
+                | |
+                | |
+                | |
+                | |
+                | |
+                | |
+                | |
+                | |
+                | |
+                | |
+                | |
+                | |
+                | |
+                | |
+                | |
+                | |
+                \ /";
+
 				spada = 1;
 				aggiinventario(inventario, ref indiceInventario, "Spada");
 			}
 			else if (scelta == 2)
 			{
 				vita = vita + 50;
+				Console.WriteLine("Il macellaio sorride sinistramente.");
+				Console.WriteLine("Ogni vittoria mi rende più forte.");
 			}
 			else if (scelta == 3)
 			{
+
+				Console.WriteLine("Il cavallerizzo accarezza la sua cavalcatura.");
+				Console.WriteLine("Se le cose vanno male, fuggiremo.");
+				string asciiArt = @"
+                                            _(\_/)
+                                          ,((((^`\
+                                         ((((  (6 \
+                                       ,((((( ,    \
+                   ,,,_              ,(((((  /""._  ,`,
+                  ((((\\ ,...       ,((((   /    `-.-'
+                  )))  ;'    `""'""'""((((   (
+                 (((  /            (((      \
+                  )) |                      |
+                 ((  |        .       '     |
+                 ))  \     _ '      `t   ,.')
+                 (   |   y;- -,-""'""-.\   \/
+                 )   / ./  ) /         `\  \
+                    |./   ( (           / /'
+                    ||     \\          //'|
+                jgs ||      \\       _//'||
+                    ||       ))     |_/  ||
+                    \_\     |_/          ||
+                    `""'                  \_\";
+
+
 				cavalcatura = 1;
 				aggiinventario(inventario, ref indiceInventario, "Cavalcatura");
 			}
@@ -227,8 +380,8 @@
 "Fine del Viaggio: La destinazione finale, segno del successo e della conclusione dell’avventura."
 		};
 
-			
-			while (giocoInCorso==true)
+
+			while (giocoInCorso == true)
 			{
 				Console.WriteLine("premi invio per tirare il dado...");
 				Console.ReadLine();
@@ -237,14 +390,14 @@
 				Console.WriteLine($"Sei arrivato in: {descrizione[posizione]}");
 
 				int tipoEvento = rnd.Next(1, 8);
-				if (tipoEvento <=4)
+				if (tipoEvento <= 4)
 				{
-					vita = eventocombattimento(ref vita, ref spada, rnd, ref mostriuccisi,scelta,ref cavalcatura);
+					vita = eventocombattimento(ref vita, ref spada, rnd, ref mostriuccisi, scelta, ref cavalcatura);
 				}
-				else if (tipoEvento<=7 || tipoEvento>=4)
+				else if (tipoEvento <= 7 || tipoEvento >= 4)
 				{
 					vita = eventoregalo(ref vita, ref spada, rnd,
-						 inventario, ref indiceInventario,  ref cavalcatura);
+						 inventario, ref indiceInventario, ref cavalcatura);
 				}
 				else
 				{
@@ -270,14 +423,15 @@
 							}
 						}
 
-						if (ciboTrovato==true)
+						if (ciboTrovato == true)
 						{
+
 							Console.WriteLine("vuoi mangiare il cibo che hai in inventario? (s/n)");
 							string sn = Console.ReadLine();
 
 							if (sn == "s")
 							{
-								vita=vita+ 20;
+								vita = vita + 20;
 								Console.WriteLine("hai mangiato del cibo e recuperato 20 punti vita.");
 							}
 						}
@@ -292,6 +446,9 @@
 
 				if (posizione == mappa.Length - 1)
 				{
+					Console.WriteLine("La luce illumina la città finale.");
+					Console.WriteLine("Hai superato ogni prova.");
+					Console.WriteLine("La leggenda del tuo viaggio sarà ricordata.");
 					Console.WriteLine("hai raggiunto la destinazione finale! Complimenti!");
 					giocoInCorso = false;
 				}
@@ -302,6 +459,7 @@
 				}
 				if (mostriuccisi >= 3)
 				{
+					Console.WriteLine("Complimenti! Hai dimostrato il tuo valore in battaglia.");
 					Console.WriteLine("hai sconfitto 3 mostri quindi hai vinto il gioco");
 					giocoInCorso = false;
 				}
@@ -309,6 +467,7 @@
 			}
 		}
 	}
+
 }
 
 
